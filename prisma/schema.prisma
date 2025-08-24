@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Deck {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  cards       Card[]
+  reviews     ReviewSession[]
+
+  @@map("decks")
+}
+
+model Card {
+  id        String   @id @default(uuid())
+  front     String
+  back      String
+  tags      String[] @default([])
+  deck      Deck     @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  deckId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Spaced Repetition Fields
+  interval        Int      @default(1)        // Days until next review
+  repetitions     Int      @default(0)        // Number of successful reviews
+  easeFactor      Float    @default(2.5)      // Ease factor for spacing calculation
+  nextReviewDate  DateTime @default(now())    // When card should be reviewed next
+  lastReviewed    DateTime?                   // Last time card was reviewed
+  reviewCount     Int      @default(0)        // Total number of reviews
+  
+  reviews ReviewSession[]
+
+  @@map("cards")
+}
+
+model ReviewSession {
+  id           String   @id @default(uuid())
+  card         Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  cardId       String
+  deck         Deck     @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  deckId       String
+  difficulty   String   // 'again', 'hard', 'good', 'easy'
+  responseTime Int      // Time taken to answer in seconds
+  reviewedAt   DateTime @default(now())
+  intervalBefore Int    // Interval before this review
+  intervalAfter  Int    // Interval after this review
+  
+  @@map("review_sessions")
+}

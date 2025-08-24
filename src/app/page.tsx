@@ -1,103 +1,150 @@
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react';
+import CSVUpload from '@/components/CSVUpload';
+import DeckList from '@/components/DeckList';
+import AnkiCardGenerator from '@/components/AnkiCardGenerator';
+
+interface AnkiCard {
+  id: string;
+  front: string;
+  back: string;
+  tags?: string[];
+}
+
+interface DeckSummary {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+  _count: {
+    cards: number;
+  };
+}
+
+interface FullDeck extends DeckSummary {
+  cards: AnkiCard[];
+}
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [selectedDeck, setSelectedDeck] = useState<FullDeck | null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [view, setView] = useState<'decks' | 'import'>('decks');
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  const handleDeckCreated = (deckId: string) => {
+    // Refresh the deck list and switch to deck view
+    setRefreshTrigger(prev => prev + 1);
+    setView('decks');
+  };
+
+  const handleSelectDeck = async (deck: DeckSummary) => {
+    try {
+      // Fetch full deck data with cards
+      const response = await fetch(`/api/decks/${deck.id}`);
+      if (response.ok) {
+        const fullDeck = await response.json();
+        setSelectedDeck(fullDeck);
+      }
+    } catch (error) {
+      console.error('Error loading deck:', error);
+    }
+  };
+
+  const handleCardsChange = async (updatedCards: AnkiCard[]) => {
+    if (!selectedDeck) return;
+
+    try {
+      // Update cards in database
+      const response = await fetch(`/api/decks/${selectedDeck.id}/cards`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ cards: updatedCards }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setSelectedDeck(result.deck);
+        setRefreshTrigger(prev => prev + 1);
+      }
+    } catch (error) {
+      console.error('Error updating cards:', error);
+    }
+  };
+
+  const handleBackToDecks = () => {
+    setSelectedDeck(null);
+    setView('decks');
+  };
+
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      <div className="max-w-6xl mx-auto">
+        <header className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">
+            Anki Card Manager
+          </h1>
+          <p className="text-lg text-gray-600">
+            Import CSV files, store decks in database, and export for Anki
+          </p>
+          
+          {/* Navigation */}
+          {!selectedDeck && (
+            <div className="flex justify-center space-x-4 mt-4">
+              <button
+                onClick={() => setView('decks')}
+                className={`px-6 py-2 rounded-lg transition-colors ${
+                  view === 'decks'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                My Decks
+              </button>
+              <button
+                onClick={() => setView('import')}
+                className={`px-6 py-2 rounded-lg transition-colors ${
+                  view === 'import'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                Import CSV
+              </button>
+            </div>
+          )}
+        </header>
+        
+        <div className="space-y-8">
+          {selectedDeck ? (
+            <div>
+              <div className="mb-4">
+                <button
+                  onClick={handleBackToDecks}
+                  className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                >
+                  ← Back to Decks
+                </button>
+              </div>
+              <AnkiCardGenerator 
+                cards={selectedDeck.cards}
+                filename={selectedDeck.name}
+                deckId={selectedDeck.id}
+                onCardsChange={handleCardsChange}
+              />
+            </div>
+          ) : view === 'import' ? (
+            <CSVUpload onDeckCreated={handleDeckCreated} />
+          ) : (
+            <DeckList 
+              onSelectDeck={handleSelectDeck}
+              refreshTrigger={refreshTrigger}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          )}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </div>
+    </main>
   );
 }
