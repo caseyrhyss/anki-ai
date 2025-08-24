@@ -298,51 +298,55 @@ export default function FlashcardReview({ deckId, onClose, onUpdate }: Flashcard
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl h-full max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-2 sm:p-4">
+      <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-5xl h-full max-h-[95vh] sm:max-h-[90vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6 rounded-t-xl">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Brain className="h-8 w-8" />
-              <div>
-                <h2 className="text-2xl font-bold">Flashcard Review</h2>
-                <div className="text-purple-100 text-sm">
-                  <p>Card {currentIndex + 1} of {cards.length}</p>
+        <div className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 text-white p-4 sm:p-6 rounded-t-2xl sm:rounded-t-3xl">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center">
+                <Brain className="h-5 w-5 sm:h-6 sm:w-6" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h2 className="text-lg sm:text-2xl md:text-3xl font-bold truncate">Flashcard Review</h2>
+                <div className="text-purple-100 text-xs sm:text-sm space-y-1">
+                  <p className="font-medium">Card {currentIndex + 1} of {cards.length}</p>
                   {session && (
-                    <p>
-                      Reviewed: {session.reviewedCards} | 
-                      Accuracy: {session.reviewedCards > 0 ? Math.round((session.correctCards / session.reviewedCards) * 100) : 0}% |
-                      Time: {formatElapsedTime(session.startTime)}
-                    </p>
+                    <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs">
+                      <span>Reviewed: {session.reviewedCards}</span>
+                      <span>Accuracy: {session.reviewedCards > 0 ? Math.round((session.correctCards / session.reviewedCards) * 100) : 0}%</span>
+                      <span>Time: {formatElapsedTime(session.startTime)}</span>
+                    </div>
                   )}
-                  {currentCard?.isNew && <p className="text-yellow-200">★ New Card</p>}
-                  {currentCard?.isOverdue && <p className="text-red-200">⏰ Overdue</p>}
+                  <div className="flex flex-wrap gap-2">
+                    {currentCard?.isNew && <span className="inline-flex items-center px-2 py-1 bg-yellow-200 bg-opacity-80 text-yellow-800 text-xs font-medium rounded-full">★ New</span>}
+                    {currentCard?.isOverdue && <span className="inline-flex items-center px-2 py-1 bg-red-200 bg-opacity-80 text-red-800 text-xs font-medium rounded-full">⏰ Overdue</span>}
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-3 self-start sm:self-center">
               <button
                 onClick={resetReview}
-                className="p-3 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition-colors border border-white border-opacity-30"
+                className="p-2 sm:p-3 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 rounded-xl transition-all duration-200 border-2 border-white shadow-lg hover:shadow-xl transform hover:scale-105"
                 title="Reset review"
               >
-                <RotateCcw className="h-5 w-5" />
+                <RotateCcw className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
               </button>
               <button
                 onClick={onClose}
-                className="p-3 bg-red-500 bg-opacity-90 rounded-lg hover:bg-red-600 hover:bg-opacity-100 transition-all duration-200 border-2 border-white shadow-lg"
+                className="p-2 sm:p-3 bg-red-500 bg-opacity-90 rounded-xl hover:bg-red-600 hover:bg-opacity-100 transition-all duration-200 border-2 border-white shadow-lg"
                 title="Close review"
               >
-                <X className="h-5 w-5 text-white font-bold" />
+                <X className="h-4 w-4 sm:h-5 sm:w-5 text-white font-bold" />
               </button>
             </div>
           </div>
           
           {/* Progress bar */}
-          <div className="mt-4 bg-white bg-opacity-20 rounded-full h-2">
+          <div className="mt-4 sm:mt-6 bg-white bg-opacity-20 rounded-full h-2 sm:h-3">
             <div
-              className="bg-white rounded-full h-2 transition-all duration-300"
+              className="bg-white rounded-full h-2 sm:h-3 transition-all duration-500 shadow-sm"
               style={{ width: `${((currentIndex + 1) / cards.length) * 100}%` }}
             />
           </div>
