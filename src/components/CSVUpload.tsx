@@ -195,26 +195,36 @@ export default function CSVUpload({ onDeckCreated }: CSVUploadProps) {
   });
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-2">Import CSV Cards</h2>
-          <p className="text-gray-600">
+    <div className="w-full max-w-5xl mx-auto px-2 sm:px-4">
+      <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-4 sm:p-6 md:p-8">
+        <div className="mb-6 sm:mb-8 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-purple-100 to-blue-100 rounded-2xl mb-4">
+            <span className="text-2xl sm:text-3xl">📥</span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-3">Import CSV Cards</h2>
+          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
             Upload a CSV file with your flashcard data. Your CSV should have columns named &quot;front&quot; and &quot;back&quot;.
           </p>
         </div>
 
         {/* CSV Format Help */}
-        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <h3 className="font-medium text-blue-800 mb-2">CSV Format Requirements:</h3>
-          <div className="text-sm text-blue-700 space-y-1">
+        <div className="mb-6 sm:mb-8 p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl">
+          <div className="flex items-start gap-3 mb-3">
+            <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center">
+              <span className="text-blue-600 font-bold text-sm">ℹ️</span>
+            </div>
+            <h3 className="font-bold text-blue-800 text-lg sm:text-xl">CSV Format Requirements:</h3>
+          </div>
+          <div className="text-sm sm:text-base text-blue-700 space-y-2 ml-11">
             <p>• <strong>Required columns:</strong> &quot;front&quot; and &quot;back&quot; (or &quot;question&quot;/&quot;answer&quot;)</p>
             <p>• <strong>Optional column:</strong> &quot;tags&quot; (comma-separated)</p>
             <p>• <strong>Example:</strong></p>
-            <div className="mt-2 bg-white p-2 rounded border font-mono text-xs">
-              front,back,tags<br/>
-              &quot;What is the capital of France?&quot;,&quot;Paris&quot;,&quot;geography,capitals&quot;<br/>
-              &quot;Define photosynthesis&quot;,&quot;The process by which plants convert light energy to chemical energy&quot;,&quot;biology,plants&quot;
+            <div className="mt-3 bg-white p-3 sm:p-4 rounded-xl border border-blue-200 font-mono text-xs sm:text-sm overflow-x-auto">
+              <div className="whitespace-nowrap">
+                front,back,tags<br/>
+                &quot;What is the capital of France?&quot;,&quot;Paris&quot;,&quot;geography,capitals&quot;<br/>
+                &quot;Define photosynthesis&quot;,&quot;The process by which plants convert light energy to chemical energy&quot;,&quot;biology,plants&quot;
+              </div>
             </div>
           </div>
         </div>
@@ -223,96 +233,123 @@ export default function CSVUpload({ onDeckCreated }: CSVUploadProps) {
         {!file ? (
           <div
             {...getRootProps()}
-            className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
+            className={`border-3 border-dashed rounded-2xl p-6 sm:p-8 md:p-12 text-center cursor-pointer transition-all duration-300 ${
               isDragActive
-                ? 'border-blue-400 bg-blue-50'
-                : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'
+                ? 'border-blue-400 bg-gradient-to-br from-blue-50 to-indigo-50 scale-105'
+                : 'border-gray-300 hover:border-blue-400 hover:bg-gradient-to-br hover:from-gray-50 hover:to-blue-50 hover:scale-102'
             }`}
           >
             <input {...getInputProps()} />
-            <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            {isDragActive ? (
-              <p className="text-lg text-blue-600">Drop your CSV file here...</p>
-            ) : (
-              <>
-                <p className="text-lg text-gray-600 mb-2">
-                  Drag & drop your CSV file here, or click to select
-                </p>
-                <p className="text-sm text-gray-500">
-                  Supports .csv files up to 50MB
-                </p>
-              </>
-            )}
+            <div className="space-y-4">
+              <div className={`mx-auto w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center transition-colors ${
+                isDragActive ? 'bg-blue-100' : 'bg-gray-100'
+              }`}>
+                <Upload className={`h-8 w-8 sm:h-10 sm:w-10 transition-colors ${
+                  isDragActive ? 'text-blue-500' : 'text-gray-400'
+                }`} />
+              </div>
+              {isDragActive ? (
+                <div>
+                  <p className="text-lg sm:text-xl font-semibold text-blue-600 mb-2">Drop your CSV file here!</p>
+                  <p className="text-sm text-blue-500">Release to upload</p>
+                </div>
+              ) : (
+                <div>
+                  <p className="text-lg sm:text-xl font-semibold text-gray-700 mb-2">
+                    Drag & drop your CSV file here
+                  </p>
+                  <p className="text-base text-gray-500 mb-3">or click to select from your device</p>
+                  <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-medium text-sm hover:shadow-lg transition-all">
+                    📁 Browse Files
+                  </div>
+                  <p className="text-xs sm:text-sm text-gray-400 mt-3">
+                    Supports .csv files up to 50MB
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         ) : (
-          <div className="border border-gray-200 rounded-xl p-4">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-3">
-                <FileText className="h-8 w-8 text-green-600" />
-                <div>
-                  <p className="font-medium text-gray-800">{file.name}</p>
-                  <p className="text-sm text-gray-500">
-                    {(file.size / (1024 * 1024)).toFixed(2)} MB
+          <div className="border-2 border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+              <div className="flex items-center space-x-3 sm:space-x-4">
+                <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 bg-green-100 rounded-2xl flex items-center justify-center">
+                  <FileText className="h-6 w-6 sm:h-7 sm:w-7 text-green-600" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-gray-800 text-sm sm:text-base truncate">{file.name}</p>
+                  <p className="text-xs sm:text-sm text-gray-500">
+                    {(file.size / (1024 * 1024)).toFixed(2)} MB • CSV File
                   </p>
                 </div>
               </div>
               <button
                 onClick={removeFile}
-                className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                className="self-start sm:self-center p-2 sm:p-3 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all duration-200"
+                title="Remove file"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
             {isProcessing && (
-              <div className="flex items-center space-x-2 text-blue-600 mb-4">
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"></div>
-                <span>Processing CSV file...</span>
+              <div className="flex items-center justify-center space-x-3 text-blue-600 mb-6 p-4 bg-blue-50 rounded-xl">
+                <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent"></div>
+                <span className="font-medium">Processing CSV file...</span>
               </div>
             )}
 
             {error && (
-              <div className="flex items-start space-x-2 p-3 bg-red-50 border border-red-200 rounded-lg mb-4">
-                <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="text-red-600 text-sm font-medium">Import Error</p>
-                  <pre className="text-red-600 text-xs mt-1 whitespace-pre-wrap">{error}</pre>
+              <div className="flex items-start space-x-3 p-4 sm:p-5 bg-red-50 border-2 border-red-200 rounded-2xl mb-6">
+                <div className="flex-shrink-0 w-8 h-8 bg-red-100 rounded-xl flex items-center justify-center">
+                  <AlertCircle className="h-5 w-5 text-red-500" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-red-700 font-semibold mb-1">Import Error</p>
+                  <pre className="text-red-600 text-xs sm:text-sm whitespace-pre-wrap break-words">{error}</pre>
                 </div>
               </div>
             )}
 
             {success && (
-              <div className="flex items-center space-x-2 p-3 bg-green-50 border border-green-200 rounded-lg mb-4">
-                <CheckCircle className="h-5 w-5 text-green-500" />
-                <p className="text-green-600 text-sm font-medium">{success}</p>
+              <div className="flex items-center space-x-3 p-4 sm:p-5 bg-green-50 border-2 border-green-200 rounded-2xl mb-6">
+                <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-xl flex items-center justify-center">
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                </div>
+                <p className="text-green-700 font-semibold text-sm sm:text-base">{success}</p>
               </div>
             )}
 
             {/* Deck Settings */}
             {readyToSave && (
-              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                <h4 className="font-medium text-gray-800 mb-3">Deck Settings:</h4>
-                <div className="space-y-3">
+              <div className="mt-6 p-4 sm:p-6 bg-gradient-to-br from-purple-50 to-indigo-50 border-2 border-purple-200 rounded-2xl">
+                <div className="flex items-center gap-3 mb-4 sm:mb-6">
+                  <div className="w-8 h-8 bg-purple-100 rounded-xl flex items-center justify-center">
+                    <span className="text-purple-600 font-bold">⚙️</span>
+                  </div>
+                  <h4 className="font-bold text-gray-800 text-lg sm:text-xl">Deck Settings</h4>
+                </div>
+                <div className="space-y-4 sm:space-y-5">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Deck Name
+                    <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-2">
+                      Deck Name *
                     </label>
                     <input
                       type="text"
                       value={deckName}
                       onChange={(e) => setDeckName(e.target.value)}
-                      className="w-full p-3 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white"
+                      className="w-full p-3 sm:p-4 border-2 border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-sm sm:text-base transition-all"
                       placeholder="Enter deck name"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-2">
                       Description (Optional)
                     </label>
                     <textarea
                       value={deckDescription}
                       onChange={(e) => setDeckDescription(e.target.value)}
-                      className="w-full p-3 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white resize-none"
+                      className="w-full p-3 sm:p-4 border-2 border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white resize-none text-sm sm:text-base transition-all"
                       rows={3}
                       placeholder="Describe your deck..."
                     />
@@ -320,15 +357,18 @@ export default function CSVUpload({ onDeckCreated }: CSVUploadProps) {
                   <button
                     onClick={saveToDeck}
                     disabled={isProcessing || !deckName.trim()}
-                    className="px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg"
+                    className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
                   >
                     {isProcessing ? (
-                      <span className="flex items-center space-x-2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                      <span className="flex items-center justify-center space-x-3">
+                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
                         <span>Creating Deck...</span>
                       </span>
                     ) : (
-                      `Create Deck (${allCards.length} cards)`
+                      <span className="flex items-center justify-center space-x-2">
+                        <span>🚀</span>
+                        <span>Create Deck ({allCards.length} cards)</span>
+                      </span>
                     )}
                   </button>
                 </div>
@@ -337,27 +377,38 @@ export default function CSVUpload({ onDeckCreated }: CSVUploadProps) {
 
             {/* Preview Cards */}
             {preview.length > 0 && (
-              <div className="mt-4">
-                <h4 className="font-medium text-gray-800 mb-3">Preview (first 5 cards):</h4>
-                <div className="space-y-3">
+              <div className="mt-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center">
+                    <span className="text-blue-600 font-bold">👀</span>
+                  </div>
+                  <h4 className="font-bold text-gray-800 text-lg sm:text-xl">Preview (first 5 cards)</h4>
+                </div>
+                <div className="space-y-4">
                   {preview.map((card, index) => (
-                    <div key={index} className="bg-gray-50 rounded-lg p-3">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div>
-                          <p className="text-xs font-medium text-gray-500 mb-1">FRONT</p>
-                          <p className="text-sm text-gray-800">{card.front}</p>
+                    <div key={index} className="bg-gradient-to-br from-gray-50 to-blue-50 border border-gray-200 rounded-2xl p-4 sm:p-5 hover:shadow-lg transition-all duration-200">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center">
+                          <span className="text-blue-600 font-bold text-xs">{index + 1}</span>
                         </div>
-                        <div>
-                          <p className="text-xs font-medium text-gray-500 mb-1">BACK</p>
-                          <p className="text-sm text-gray-800">{card.back}</p>
+                        <span className="text-sm font-medium text-gray-600">Card {index + 1}</span>
+                      </div>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div className="bg-white rounded-xl p-3 sm:p-4 border border-blue-200">
+                          <p className="text-xs font-bold text-blue-600 uppercase tracking-wide mb-2">FRONT</p>
+                          <p className="text-sm sm:text-base text-gray-800 leading-relaxed">{card.front}</p>
+                        </div>
+                        <div className="bg-white rounded-xl p-3 sm:p-4 border border-green-200">
+                          <p className="text-xs font-bold text-green-600 uppercase tracking-wide mb-2">BACK</p>
+                          <p className="text-sm sm:text-base text-gray-800 leading-relaxed">{card.back}</p>
                         </div>
                       </div>
                       {card.tags && card.tags.length > 0 && (
-                        <div className="mt-2">
-                          <p className="text-xs font-medium text-gray-500 mb-1">TAGS</p>
-                          <div className="flex flex-wrap gap-1">
+                        <div className="mt-4 pt-3 border-t border-gray-200">
+                          <p className="text-xs font-bold text-purple-600 uppercase tracking-wide mb-2">TAGS</p>
+                          <div className="flex flex-wrap gap-2">
                             {card.tags.map((tag, tagIndex) => (
-                              <span key={tagIndex} className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded">
+                              <span key={tagIndex} className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full border border-purple-200">
                                 {tag}
                               </span>
                             ))}
