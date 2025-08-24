@@ -80,52 +80,60 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="max-w-6xl mx-auto">
-        <header className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">
-            Anki Card Manager
-          </h1>
-          <p className="text-lg text-gray-600">
-            Import CSV files, store decks in database, and export for Anki
-          </p>
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 px-3 py-4 sm:px-4 md:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <header className="text-center mb-6 sm:mb-8 lg:mb-12">
+          <div className="relative">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent mb-3 sm:mb-4">
+              Anki Card Manager
+            </h1>
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              Import CSV files, store decks in database, and export for Anki with intelligent spaced repetition
+            </p>
+          </div>
           
           {/* Navigation */}
           {!selectedDeck && (
-            <div className="flex justify-center space-x-4 mt-4">
+            <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mt-6 sm:mt-8">
               <button
                 onClick={() => setView('decks')}
-                className={`px-6 py-2 rounded-lg transition-colors ${
+                className={`px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 ${
                   view === 'decks'
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-50 border-2 border-gray-200 hover:border-purple-300'
                 }`}
               >
-                My Decks
+                <span className="flex items-center justify-center gap-2">
+                  📚 My Decks
+                </span>
               </button>
               <button
                 onClick={() => setView('import')}
-                className={`px-6 py-2 rounded-lg transition-colors ${
+                className={`px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 ${
                   view === 'import'
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-50 border-2 border-gray-200 hover:border-purple-300'
                 }`}
               >
-                Import CSV
+                <span className="flex items-center justify-center gap-2">
+                  📥 Import CSV
+                </span>
               </button>
             </div>
           )}
         </header>
         
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8">
           {selectedDeck ? (
-            <div>
-              <div className="mb-4">
+            <div className="w-full">
+              <div className="mb-4 sm:mb-6">
                 <button
                   onClick={handleBackToDecks}
-                  className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                  className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl hover:from-gray-600 hover:to-gray-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 font-medium"
                 >
-                  ← Back to Decks
+                  <span>←</span>
+                  <span className="hidden sm:inline">Back to Decks</span>
+                  <span className="sm:hidden">Back</span>
                 </button>
               </div>
               <AnkiCardGenerator 
@@ -136,12 +144,16 @@ export default function Home() {
               />
             </div>
           ) : view === 'import' ? (
-            <CSVUpload onDeckCreated={handleDeckCreated} />
+            <div className="w-full">
+              <CSVUpload onDeckCreated={handleDeckCreated} />
+            </div>
           ) : (
-            <DeckList 
-              onSelectDeck={handleSelectDeck}
-              refreshTrigger={refreshTrigger}
-            />
+            <div className="w-full">
+              <DeckList 
+                onSelectDeck={handleSelectDeck}
+                refreshTrigger={refreshTrigger}
+              />
+            </div>
           )}
         </div>
       </div>
