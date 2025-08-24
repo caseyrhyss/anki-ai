@@ -4,11 +4,13 @@ import { prisma } from '@/lib/prisma';
 // GET /api/decks/[id] - Get a specific deck with cards
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+    
     const deck = await prisma.deck.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         cards: {
           orderBy: { createdAt: 'asc' }
@@ -39,10 +41,11 @@ export async function GET(
 // PUT /api/decks/[id] - Update a deck
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { name, description } = await request.json();
+    const { id } = await params;
 
     if (!name || name.trim().length === 0) {
       return NextResponse.json(
@@ -52,7 +55,7 @@ export async function PUT(
     }
 
     const deck = await prisma.deck.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name: name.trim(),
         description: description?.trim() || null,
@@ -78,11 +81,13 @@ export async function PUT(
 // DELETE /api/decks/[id] - Delete a deck
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+    
     await prisma.deck.delete({
-      where: { id: params.id }
+      where: { id }
     });
 
     return NextResponse.json({ success: true });

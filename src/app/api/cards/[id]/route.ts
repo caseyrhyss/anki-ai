@@ -4,10 +4,11 @@ import { prisma } from '@/lib/prisma';
 // PUT /api/cards/[id] - Update a specific card
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { front, back, tags } = await request.json();
+    const { id } = await params;
 
     if (!front?.trim() || !back?.trim()) {
       return NextResponse.json(
@@ -17,7 +18,7 @@ export async function PUT(
     }
 
     const card = await prisma.card.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         front: front.trim(),
         back: back.trim(),
@@ -38,11 +39,13 @@ export async function PUT(
 // DELETE /api/cards/[id] - Delete a specific card
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+    
     await prisma.card.delete({
-      where: { id: params.id }
+      where: { id }
     });
 
     return NextResponse.json({ success: true });

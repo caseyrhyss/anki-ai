@@ -4,18 +4,19 @@ import { prisma } from '@/lib/prisma';
 // GET /api/decks/[id]/due-cards - Get cards due for review
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { searchParams } = new URL(request.url);
     const includeNew = searchParams.get('includeNew') === 'true';
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined;
+    const { id } = await params;
 
     const now = new Date();
 
     // Get cards due for review
     const whereClause = {
-      deckId: params.id,
+      deckId: id,
       OR: [
         // Cards that are due for review
         { nextReviewDate: { lte: now } },
@@ -43,7 +44,7 @@ export async function GET(
 
     // Get deck info
     const deck = await prisma.deck.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: {
         id: true,
         name: true,

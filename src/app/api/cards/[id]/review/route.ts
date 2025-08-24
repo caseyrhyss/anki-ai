@@ -85,10 +85,11 @@ function calculateInterval(
 // POST /api/cards/[id]/review - Record a review response
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { difficulty, responseTime, totalCards } = await request.json();
+    const { id } = await params;
 
     if (!['again', 'hard', 'good', 'easy'].includes(difficulty)) {
       return NextResponse.json(
@@ -99,7 +100,7 @@ export async function POST(
 
     // Get current card data
     const card = await prisma.card.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { deck: true }
     });
 
@@ -129,7 +130,7 @@ export async function POST(
     const result = await prisma.$transaction(async (tx) => {
       // Update card
       const updatedCard = await tx.card.update({
-        where: { id: params.id },
+        where: { id },
         data: {
           interval: newInterval,
           repetitions: newRepetitions,
@@ -143,7 +144,7 @@ export async function POST(
       // Create review session record
       await tx.reviewSession.create({
         data: {
-          cardId: params.id,
+          cardId: id,
           deckId: card.deckId,
           difficulty: difficulty as string,
           responseTime: responseTime || 0,

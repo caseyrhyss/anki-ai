@@ -10,10 +10,11 @@ interface AnkiCard {
 // POST /api/decks/[id]/cards - Add cards to a deck (for CSV import)
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { cards } = await request.json();
+    const { id } = await params;
 
     if (!cards || !Array.isArray(cards) || cards.length === 0) {
       return NextResponse.json(
@@ -24,7 +25,7 @@ export async function POST(
 
     // Verify deck exists
     const deck = await prisma.deck.findUnique({
-      where: { id: params.id }
+      where: { id }
     });
 
     if (!deck) {
@@ -40,13 +41,13 @@ export async function POST(
         front: card.front.trim(),
         back: card.back.trim(),
         tags: card.tags || [],
-        deckId: params.id
+        deckId: id
       }))
     });
 
     // Fetch the created cards to return them
     const deckWithCards = await prisma.deck.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         cards: {
           orderBy: { createdAt: 'asc' }
@@ -72,10 +73,11 @@ export async function POST(
 // PUT /api/decks/[id]/cards - Update all cards in a deck (replace)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { cards } = await request.json();
+    const { id } = await params;
 
     if (!cards || !Array.isArray(cards)) {
       return NextResponse.json(
@@ -86,7 +88,7 @@ export async function PUT(
 
     // Verify deck exists
     const deck = await prisma.deck.findUnique({
-      where: { id: params.id }
+      where: { id }
     });
 
     if (!deck) {
@@ -100,7 +102,7 @@ export async function PUT(
     await prisma.$transaction(async (tx) => {
       // Delete all existing cards in the deck
       await tx.card.deleteMany({
-        where: { deckId: params.id }
+        where: { deckId: id }
       });
 
       // Create new cards if any
@@ -110,7 +112,7 @@ export async function PUT(
             front: card.front.trim(),
             back: card.back.trim(),
             tags: card.tags || [],
-            deckId: params.id
+            deckId: id
           }))
         });
       }
@@ -118,7 +120,7 @@ export async function PUT(
 
     // Fetch updated deck with cards
     const updatedDeck = await prisma.deck.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         cards: {
           orderBy: { createdAt: 'asc' }
